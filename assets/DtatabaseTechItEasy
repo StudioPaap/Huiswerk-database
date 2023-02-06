@@ -1,16 +1,94 @@
-CREATE TABLE user (
-    id serial,
-    name varchar(255),
-    password varchar(10),
+drop table if exists user_users;
+drop table if exists remote_controllers;
+drop table if exists CI_modules;
+drop table if exists wall_brackets;
+drop table if exists televisions;
+drop table if exists products;
+
+
+CREATE TABLE user_users (
+                            id serial,
+                            name varchar(255),
+                            password varchar(10)
 
 );
 
-CREATE TABLE product (
-    id serial,
-    name varchar(255),
-    brand varchar(255),
-    price double,
-    current_stock int,
-    sold int,
-    primary key(id)
+CREATE TABLE products (
+                          id serial,
+                          name varchar(255),
+                          brand varchar(255),
+                          price double precision,
+                          current_stock int,
+                          sold int,
+                          primary key(id)
 );
+
+CREATE TABLE televisions (
+
+                             type_tv varchar(255),
+                             available boolean,
+                             refresh_rate varchar(255),
+                             screen_type varchar(255),
+                             primary key(brand)
+) INHERITS(products);
+
+INSERT INTO televisions(name, brand, price, current_stock, sold, type_tv, available, refresh_rate, screen_type)
+VALUES ('The frame', 'Samsung', 100.00, 2, 13, 'A2-23', true, '1.2 sev', 'glass'),
+       ('Box-year', 'LG', 200.00, 5, 3, 'B2-23', false, '1.6 sev', 'plexi'),
+       ('The wire', 'Philips', 150.00, 4, 9, 'C2-23', true, '1.2 sev', 'glass');
+
+
+CREATE TABLE remote_controllers(
+
+                                   compatible_with varchar(255),
+                                   compatible_with2 varchar(255),
+                                   compatible_with3 varchar(255),
+                                   battery_type varchar(255),
+                                   foreign key (compatible_with) references televisions(brand)
+
+)INHERITS(products);
+
+INSERT INTO remote_controllers(name, brand, price, current_stock, sold, compatible_with,compatible_with2, battery_type)
+VALUES ('Speedy','Philips', 12.90, 12, 10, (SELECT brand FROM televisions WHERE type_tv='B2-23'),'null', 'AA'),
+       ('Starlight','Samsung', 10.00, 4, 11, (SELECT brand FROM televisions WHERE type_tv='B2-23'),'null', 'AA'),
+       ('Llight','Philips', 10.00, 25, 3, (SELECT brand FROM televisions WHERE type_tv='A2-23'), (SELECT brand FROM televisions WHERE type_tv='B2-23'), 'AA')
+;
+
+
+
+CREATE TABLE CI_Modules(
+
+                           combined_with varchar(255),
+                           combined_with2 varchar(255),
+                           combined_with3 varchar(255),
+                           foreign key(combined_with) references televisions(brand)
+)INHERITS(products);
+
+INSERT INTO CI_Modules(name, brand, price, current_stock, sold, combined_with)
+VALUES ('performer', 'B&O', 12.00, 22, 22, (SELECT brand FROM televisions WHERE type_tv='A2-23') );
+INSERT INTO CI_Modules(name, brand, price, current_stock, sold, combined_with, combined_with2)
+VALUES ('digital', 'Philips', 13.00, 22, 32, (SELECT brand FROM televisions WHERE type_tv='A2-23'),(SELECT brand FROM televisions WHERE type_tv='B2-23') );
+
+
+
+CREATE TABLE wall_brackets(
+                              combined_with varchar(255),
+                              combined_with2 varchar(255),
+                              combined_with3 varchar(255),
+                              foreign key(combined_with) references televisions(brand)
+
+)INHERITS(products);
+
+INSERT INTO wall_brackets(name, brand, price, current_stock, sold, combined_with)
+VALUES ('Hook', 'Keller', 21.00, 33, 34, (SELECT brand FROM televisions WHERE type_tv='A2-23') );
+INSERT INTO wall_brackets(name, brand, price, current_stock, sold, combined_with, combined_with2)
+VALUES ('Haak', 'Siemens', 18.00, 12, 54, (SELECT brand FROM televisions WHERE type_tv='A2-23'),(SELECT brand FROM televisions WHERE type_tv='B2-23') );
+
+
+SELECT * FROM televisions;
+SELECT * FROM products;
+
+SELECT CONCAT('Televisie', t.name, ' van het merk ', t.brand, ' gaat samen met afstandsbediening')
+from televisions t;
+
+
